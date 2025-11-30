@@ -17,16 +17,22 @@ export default function LoginPage() {
   const router = useRouter();
   const [disableButton, setDisableButton] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const onLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/user/login", user);
+      const response = await axios.post<{ success: boolean; message: string }>(
+        "/api/user/login",
+        user
+      );
 
-      console.log(response.data);
-
-      toast.success("Login Success");
-      router.push("/profile");
+      if (response.data.success) {
+        toast.success("Login Success");
+        router.push("/profile");
+      } else {
+        setError(response.data.message);
+      }
     } catch (error: any) {
       toast.error("Error while Logging in ");
       console.log("Error", error);
@@ -50,6 +56,10 @@ export default function LoginPage() {
         <h3 className="text-2xl font-semibold text-white text-center mb-6">
           {loading ? "processing" : "Welcome to Login Page"}
         </h3>
+
+        <h4 className="text-xl font-semibold text-red-400 text-center mb-3">
+          {error ? `${error}` : ""}
+        </h4>
 
         <label htmlFor="email" className="text-white/90 font-medium">
           Email

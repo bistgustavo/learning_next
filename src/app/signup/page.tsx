@@ -18,27 +18,35 @@ export default function signUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [disableButton, setDisableButton] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const onSignUp = async () => {
     try {
       setLoading(true);
 
-
-      const response = await axios.post("/api/user/signup", user);
+      const response = await axios.post<{ success: boolean; message: string }>(
+        "/api/user/signup",
+        user
+      );
       console.log(response.data);
 
-      toast.success("user created!");
+      if (response.data.success) {
+        toast.success("user created!");
 
-      setUser({
-        email: "",
-        password: "",
-        username: "",
-      });
+        setUser({
+          email: "",
+          password: "",
+          username: "",
+        });
 
-      router.push("/login");
+        router.push("/login");
+      } else {
+        setError(response.data.message);
+      }
     } catch (error: any) {
       console.log("Error logging in", error.message);
       toast.error("Something went wrong");
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -65,6 +73,10 @@ export default function signUpPage() {
         <h3 className="text-2xl font-semibold text-center mb-6">
           {loading ? "processing" : "Welcome to Signup"}
         </h3>
+
+        <h4 className="text-xl font-semibold text-center mb-6">
+          {error ? `${error}` : ""}
+        </h4>
 
         {/* Username */}
         <label htmlFor="username" className="font-medium">

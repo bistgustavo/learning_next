@@ -1,36 +1,43 @@
 import mongoose from "mongoose";
-import { unique } from "next/dist/build/utils";
 
 const userSchema = new mongoose.Schema({
   username: {
-    type: "String",
-    requred: [true, "Please provide the username"],
+    type: String,
+    required: [true, "Please provide a username"],
     unique: true,
+    trim: true,
   },
+
   email: {
-    type: "String",
-    requred: [true, "Please provide the username"],
+    type: String,
+    required: [true, "Please provide an email"],
     unique: true,
+    lowercase: true,
+    trim: true,
   },
+
   password: {
-    type: "String",
-    requred: [true, "Please provide the username"],
-    unique: true,
+    type: String,
+    required: [true, "Please provide a password"],
   },
-  isVerfied: {
+
+  isVerified: {
     type: Boolean,
     default: false,
   },
+
   isAdmin: {
     type: Boolean,
     default: false,
   },
+
   forgetPasswordToken: String,
   forgetPasswordTokenExpiry: Date,
+
   verifyToken: String,
   verifyTokenExpiry: Date,
 });
 
-const User = mongoose.models.users || mongoose.model("users", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;
