@@ -24,29 +24,21 @@ export default function signUpPage() {
     try {
       setLoading(true);
 
-      const response = await axios.post<{ success: boolean; message: string }>(
+      const response = await axios.post<{ message: string; success: boolean }>(
         "/api/user/signup",
         user
       );
-      console.log(response.data);
 
       if (response.data.success) {
-        toast.success("user created!");
-
-        setUser({
-          email: "",
-          password: "",
-          username: "",
-        });
-
+        toast.success("User Created");
         router.push("/login");
       } else {
-        setError(response.data.message);
+        setError(error);
       }
     } catch (error: any) {
-      console.log("Error logging in", error.message);
-      toast.error("Something went wrong");
-      setError(error.message);
+      console.log("Signup Error:", error.response?.data || error);
+      toast.error(error.response?.data?.message || "Something went wrong");
+      setError(error.error);
     } finally {
       setLoading(false);
     }
@@ -74,7 +66,7 @@ export default function signUpPage() {
           {loading ? "processing" : "Welcome to Signup"}
         </h3>
 
-        <h4 className="text-xl font-semibold text-center mb-6">
+        <h4 className="text-xl font-semibold text-red-400 text-center mb-6">
           {error ? `${error}` : ""}
         </h4>
 
