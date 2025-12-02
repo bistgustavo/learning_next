@@ -43,14 +43,22 @@ export async function POST(request: NextRequest) {
       expiresIn: parseInt(process.env.JWT_EXPIRY || "3600", 10), // Default to 3600 seconds if undefined
     });
 
-    const response = NextResponse.json({
-      message: "Login succesfully",
-      success: true,
-    });
+    if (user.isVerified) {
+      const response = NextResponse.json({
+        message: "Login succesfully",
+        data: user,
+        success: true,
+      });
 
-    response.cookies.set("token", token, { httpOnly: true });
+      response.cookies.set("token", token, { httpOnly: true });
 
-    return response;
+      return response;
+    } else {
+      return NextResponse.json(
+        { message: "Verify your email" },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     return NextResponse.json({ message: "Error Logging In" }, { status: 400 });
   }

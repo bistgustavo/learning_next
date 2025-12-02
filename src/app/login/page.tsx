@@ -22,20 +22,23 @@ export default function LoginPage() {
   const onLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post<{ success: boolean; message: string }>(
-        "/api/user/login",
-        user
-      );
 
-      if (response.data.success) {
+      const response = await axios.post<{
+        data: { isVerified: boolean; message: string };
+      }>("/api/user/login", user);
+
+      if (response.data?.data?.isVerified) {
         toast.success("Login Success");
         router.push("/profile");
       } else {
-        setError(response.data.message);
+        setError(response.data.data.message);
+        toast.error(response.data.data.message);
       }
     } catch (error: any) {
-      toast.error("Error while Logging in ");
-      console.log("Error", error);
+      const msg = error?.response?.data?.message || "Error while Logging in";
+      setError(msg);
+      toast.error(msg);
+      console.log("Error from backend:", msg);
     } finally {
       setLoading(false);
     }

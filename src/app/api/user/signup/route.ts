@@ -1,4 +1,5 @@
 import { connect } from "@/dsConfig/dsConfig";
+import { sendEmail } from "@/helpers/mailer";
 import User from "@/models/userModel";
 import bcryptjs from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -43,6 +44,14 @@ export async function POST(request: NextRequest) {
     });
 
     const savedUser = await newUser.save();
+
+    await sendEmail({
+      email,
+      emailType: "VERIFY",
+      userId: savedUser._id,
+    });
+
+    console.log(savedUser);
 
     if (savedUser) {
       return NextResponse.json({
