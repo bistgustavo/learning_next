@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import api from "@/utils/axiosInstance";
 
 export default function LoginPage() {
   const [user, setUser] = React.useState({
@@ -23,17 +23,22 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const response = await axios.post<{
-        data: { isVerified: boolean; message: string };
+      const response = await api.post<{
+        success: boolean;
+        message: string;
+        data?: { isVerified: boolean };
       }>("/api/user/login", user);
 
-      if (response.data?.data?.isVerified) {
-        toast.success("Login Success");
+      if (response.data.success && response.data.data?.isVerified) {
+        toast.success("Login successful");
         router.push("/profile");
-      } else {
-        setError(response.data.data.message);
-        toast.error(response.data.data.message);
+        return;
       }
+
+      const message =
+        response.data.message || "Something went wrong while logging in";
+      setError(message);
+      toast.error(message);
     } catch (error: any) {
       const msg = error?.response?.data?.message || "Error while Logging in";
       setError(msg);
@@ -47,6 +52,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (user.email.length > 0 && user.password.length > 0) {
       setDisableButton(false);
+    } else {
+      setDisableButton(true);
     }
   }, [user]);
 
@@ -101,10 +108,14 @@ export default function LoginPage() {
 
         <button
           onClick={onLogin}
-          className="w-full bg-white/30 hover:bg-white/40 text-white font-semibold py-2 rounded-lg 
-                 backdrop-blur-md transition-all"
+          disabled={disableButton || loading}
+          className={`w-full text-white font-semibold py-2 rounded-lg backdrop-blur-md transition-all ${
+            disableButton || loading
+              ? "bg-white/10 cursor-not-allowed"
+              : "bg-white/30 hover:bg-white/40"
+          }`}
         >
-          {disableButton ? "Enter Email and Password" : "Login"}
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <Link

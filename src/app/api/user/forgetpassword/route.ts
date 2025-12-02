@@ -14,12 +14,13 @@ export async function POST(request: NextRequest) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = User.findByIdAndUpdate(userId, {
+    const user = await User.findByIdAndUpdate(userId, {
       password: hashedPassword,
     });
 
     return NextResponse.json({
       message: "Password changed successfully",
+      user,
       success: true,
     });
   } catch (error: any) {

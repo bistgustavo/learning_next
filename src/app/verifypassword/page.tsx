@@ -11,7 +11,7 @@ function Page() {
 
   const verifyUserPassword = async () => {
     try {
-      await axios.post("api/user/verifyPassword", { token });
+      await axios.post("api/user/verifypassword", { token });
       setIsVerified(true);
     } catch (error: any) {
       setError(true);

@@ -1,13 +1,24 @@
+
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-export async function getDataFromToken(request: NextRequest) {
+
+export function getDataFromToken(request: NextRequest) {
   try {
+    // Get token from cookies
     const token = request.cookies.get("token")?.value || "";
 
-    const decodedToken: any = jwt.verify(token, process.env.JWT_SECRET!);
+    if (!token) {
+      console.log("getDataFromToken: No token found in cookies");
+      return null;
+    }
 
-    return decodedToken.id;
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+
+    console.log("getDataFromToken: Token valid for user ID:", decoded.id);
+    return decoded.id;
   } catch (error: any) {
-    throw new Error(error.message);
+    console.error("getDataFromToken error:", error.message);
+    return null;
   }
 }
